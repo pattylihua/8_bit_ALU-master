@@ -1,0 +1,55 @@
+module alu(
+    input alufn[6],  // ALUFN [5:0]
+    input a[8],
+    input b[8],
+    output out[8]
+  ) {
+  
+  add adder;
+  boolean bool;
+  compare cmp;
+  shifter shift;
+  
+  always {
+    
+    // adder8
+    adder.a = a;
+    adder.b = b;
+    adder.alufn = alufn[0];
+    
+    // boole8
+    bool.a = a;
+    bool.b = b;
+    bool.alufn = alufn[3:0];
+    
+    // compare8
+    cmp.z = adder.z;
+    cmp.v = adder.v;
+    cmp.n = adder.n;
+    cmp.alufn = alufn[1:0];
+    
+    // shift8
+    shift.a = a;
+    shift.b = b[2:0];
+    shift.alufn = alufn[1:0];
+    
+    case(alufn[5:4]) {
+    
+    /*
+      Using the inputs of the alufn,
+      we can decide the operation to be performed 
+      by choosing the right module.
+    */
+      2b00: // adder
+        out = adder.out;
+      2b01: // boole
+        out = bool.out;
+      2b10: // shifter
+        out = shift.out;
+      2b11: // compare
+        out = cmp.out;
+      default:
+        out = 8x{0};
+    }
+  }
+}

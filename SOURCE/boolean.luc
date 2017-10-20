@@ -1,0 +1,24 @@
+module boolean (
+    input a[8],
+    input b[8],
+    input alufn[6],
+    output out[8]
+  ) {
+
+  always {
+    out = 8hxx;
+    
+    case(alufn) {
+      b1000: //AND
+        out = a & b;
+      b1110: //OR
+        out = a | b;
+      b0110: //XOR
+        out = a ^ b;
+      b1010: //LDR
+        out = a;
+      b0111: //INV
+        out = ~a;
+    }
+  }
+}

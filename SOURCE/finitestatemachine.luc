@@ -1,0 +1,145 @@
+module finitestatemachine (
+    input clk,  // clock
+    input rst,  // reset
+    input io_button[5],
+    output test_no[4],
+    output io_seg[8],
+    output io_sel[4]
+  ) {
+
+  .clk(clk) {
+  
+    .rst(rst) {
+    
+      multi_seven_seg seg;
+      
+      fsm state(#INIT(IDLE)) = {IDLE, ADD, BOOL, CMP, SHIFT, FAULTY};     
+    }
+}
+  
+  always {
+    
+    state.d = state.q;
+    test_no = 0;
+    
+    // seg
+    seg.values = {5d10,5d10,5d10,5d10};
+    io_seg = ~seg.seg;
+    io_sel = ~seg.sel;
+    
+    case (state.q) {
+      state.IDLE:
+        seg.values = {5d11,5d18,5d24,5d10};  // ALU
+      /*
+        This State waits for input from the 5 buttons on IO shield
+        to decide which test to carry out 
+           Up - test Adder Module
+           Center - test Comparator Module
+           Down - test Shifter Module
+           Left - test Boolean Module
+           Right - Showcase Faulty module for error detection
+      */
+        if (btnUp.out) {
+          test_add.rst = 1;
+          state.d = state.ADD;
+        }
+        if (btnCen.out) {
+          test_cmp.rst = 1;
+          state.d = state.CMP;
+        }
+        if (btnDown.out) {
+          test_shift.rst = 1;
+          state.d = state.SHIFT;
+        }
+        if (btnLeft.out) {
+          test_bool.rst = 1;
+          state.d = state.BOOL;
+        }
+        if (btnRight.out) {
+          test_fadd.rst = 1;
+          state.d = state.FAULTY;
+        }
+        
+      state.ADD:
+        
+        if (test_add.out) {
+          seg.values = {5d11,5d14,5d14,5d1};  // Add1
+        }
+        else {
+          seg.values = {5d11,5d14,5d14,5d0};  // Add0
+        }
+      /*
+        This state tests the Adder module
+        It will run through all the test cases in test_adder8
+        before it comes to a stop, and returns to the IDLE state
+        where further testing can be carried out.
+      */
+        test_no = test_add.test_no;
+        if (test_add.done == 1) { //checking if testing is done 
+          state.d = state.IDLE;
+        }
+      state.CMP:
+        if (test_cmp.out) {
+          seg.values = {5d13,5d21,5d15,5d1};  // CPE1
+        }
+        else {
+          seg.values = {5d13,5d21,5d15,5d0};  // CPE0
+        }
+      /*
+        This state tests the Comparator module
+        It will run through all the test cases in test_compare8
+        before it comes to a stop, and returns to the IDLE state
+        where further testing can be carried out.
+      */
+        test_no = test_cmp.test_no;
+        if (test_cmp.done == 1) {
+          state.d = state.IDLE;
+        }
+      state.SHIFT:
+        if (test_shift.out) {
+          seg.values = {5d23,5d17,5d16,5d1};  // SHF1
+        }
+        else {
+          seg.values = {5d23,5d17,5d16,5d0};  // SHF0
+        }
+      /*
+        This state tests the Shifter module
+        It will run through all the test cases in test_shift8
+        before it comes to a stop, and returns to the IDLE state
+        where further testing can be carried out.
+      */
+        test_no = test_shift.test_no;
+        if (test_shift.done) {
+          state.d = state.IDLE;
+        }
+      state.BOOL:
+        if (test_bool.out) {
+          seg.values = {5d12,5d20,5d20,5d1}; // bOO1
+        }
+        else {
+          seg.values = {5d12,5d20,5d20,5d0}; // bOO0
+        }
+      /*
+        This state tests the Boolean module
+        It will run through all the test cases in test_boole8
+        before it comes to a stop, and returns to the IDLE state
+        where further testing can be carried out.
+      */
+        test_no = test_bool.test_no;
+        if (test_bool.done) {
+          state.d = state.IDLE;
+        }
+      state.FAULTY:
+        if (test_fadd.out) {
+          seg.values = {5d11,5d14,5d14,5d1}; // Add1
+        }
+        else {
+          seg.values = {5d11,5d14,5d14,5d0}; // Add0
+        }
+        test_no = test_fadd.test_no;
+        if (test_fadd.done) {
+          state.d = state.IDLE;
+        }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+module compare (
+    input z,
+    input v,
+    input n,
+    input alufn[6],
+    output out[8]
+  ) {
+
+  always {
+    
+    case (alufn[2:1]){
+      2b01: //CMPEQ
+        out = z;
+      2b10: //CMPLT
+        out = n ^ v;
+      2b11: //CMPLE
+        out = z | (n ^ v);
+      default:
+        out = 0;
+    }
+  }
+}

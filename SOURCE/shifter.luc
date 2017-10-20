@@ -1,0 +1,20 @@
+module shifter (
+    input a[8],
+    input b[5],
+    input alufn[6],
+    output out[8]
+  ) {
+
+  always {
+    out = 8hxx;
+    
+    case (alufn){
+      b00: //SHL
+        out = a << b;
+      b01: //SHR
+        out = a >> b;
+      b11: //SRA
+        out = $signed(a) >>> b;
+    }
+  }
+}

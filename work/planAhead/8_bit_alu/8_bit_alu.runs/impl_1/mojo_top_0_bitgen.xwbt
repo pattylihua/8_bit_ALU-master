@@ -1,0 +1,8 @@
+INTSTYLE=pa
+INFILE=E:\8_bit_ALU-master\work\planAhead\8_bit_alu\8_bit_alu.runs\impl_1\mojo_top_0_routed.ncd
+OUTFILE=E:\8_bit_ALU-master\work\planAhead\8_bit_alu\8_bit_alu.runs\impl_1\mojo_top_0.bit
+FAMILY=Spartan6
+PART=xc6slx9-2tqg144
+WORKINGDIR=E:\8_bit_ALU-master\work\planAhead\8_bit_alu\8_bit_alu.runs\impl_1
+LICENSE=WebPack
+USER_INFO=211414099_0_0_934
